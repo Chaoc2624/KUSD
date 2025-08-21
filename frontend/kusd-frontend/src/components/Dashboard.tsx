@@ -58,7 +58,7 @@ const Dashboard: React.FC = () => {
           transition={{ duration: 0.8 }}
         >
           <h2 className="section-title">
-            Protocol <span className="text-gradient">Dashboard</span>
+            KUSD <span className="text-gradient">Dashboard</span>
           </h2>
           <p className="section-description">
             Monitor your positions, manage collateral, and optimize yields in real-time

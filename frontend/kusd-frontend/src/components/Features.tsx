@@ -48,7 +48,7 @@ const Features: React.FC = () => {
     {
       icon: Brain,
       title: "AI-Powered Optimization",
-      description: "Advanced machine learning algorithms continuously optimize yield strategies across multiple DeFi protocols.",
+      description: "Advanced machine learning algorithms continuously optimize yield strategies across multiple DeFi platforms.",
       color: "from-purple-500 to-pink-500"
     },
     {
@@ -78,7 +78,7 @@ const Features: React.FC = () => {
     {
       icon: TrendingUp,
       title: "Competitive Yields",
-      description: "Earn industry-leading yields through automated DeFi strategies and protocol incentives.",
+      description: "Earn industry-leading yields through automated DeFi strategies and platform incentives.",
       color: "from-yellow-500 to-orange-500"
     }
   ]
@@ -121,7 +121,7 @@ const Features: React.FC = () => {
           transition={{ duration: 0.8 }}
         >
           <h2 className="section-title">
-            Why Choose <span className="text-gradient">KUSD Protocol</span>
+            Why Choose <span className="text-gradient">KUSD</span>
           </h2>
           <p className="section-description">
             Experience the next generation of stablecoin technology with advanced features 

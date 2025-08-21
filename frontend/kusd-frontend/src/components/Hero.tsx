@@ -29,7 +29,7 @@ const Hero: React.FC = () => {
             >
               Next-Gen <span className="text-gradient">Multi-Asset</span>
               <br />
-              Stablecoin Protocol
+              Stablecoin
             </motion.h1>
 
             <motion.p
@@ -104,7 +104,7 @@ const Hero: React.FC = () => {
                 <TrendingUp size={32} />
               </div>
               <h3>AI-Powered Yields</h3>
-              <p>Automated strategies optimize your returns across DeFi protocols</p>
+              <p>Automated strategies optimize your returns across DeFi platforms</p>
             </motion.div>
 
             <motion.div

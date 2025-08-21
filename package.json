@@ -1,7 +1,7 @@
 {
-  "name": "kusd-defi-protocol",
+  "name": "kusd-defi",
   "version": "1.0.0",
-  "description": "Multi-asset stablecoin protocol with AI-powered yield strategies",
+  "description": "Multi-asset stablecoin with AI-powered yield strategies",
   "main": "index.js",
   "scripts": {
     "compile": "hardhat compile",

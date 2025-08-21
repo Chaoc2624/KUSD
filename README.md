@@ -1,18 +1,18 @@
-# KUSD DeFi Protocol
+# KUSD DeFi
 
-Multi-asset stablecoin protocol with AI-powered yield strategies
+Multi-asset stablecoin with AI-powered yield strategies
 
 ## Overview
 
-KUSD is a decentralized stablecoin protocol that enables users to mint stable tokens collateralized by multiple asset types including liquid staking tokens (LSTs) and real-world assets (RWAs). The protocol features AI-powered yield optimization strategies to maximize returns on collateral.
+KUSD is a decentralized stablecoin that enables users to mint stable tokens collateralized by multiple asset types including liquid staking tokens (LSTs) and real-world assets (RWAs). It features AI-powered yield optimization strategies to maximize returns on collateral.
 
 ## Features
 
 - **Multi-Asset Collateral**: Support for LSTs, RWAs, and traditional crypto assets
-- **AI-Powered Yield Strategies**: Automated yield optimization across DeFi protocols
+- **AI-Powered Yield Strategies**: Automated yield optimization across DeFi platforms
 - **Modular Architecture**: Pluggable adapters for different yield sources (Aave, Curve, Lido, Uniswap)
 - **Risk Management**: Built-in risk assessment and collateralization monitoring
-- **Upgradeable Contracts**: UUPS proxy pattern for seamless protocol upgrades
+- **Upgradeable Contracts**: UUPS proxy pattern for seamless system upgrades
 - **Multi-Chain Support**: Deploy on Ethereum, Arbitrum, and Optimism
 
 ## Architecture
@@ -30,9 +30,9 @@ KUSD is a decentralized stablecoin protocol that enables users to mint stable to
 - **LSTVault.sol**: Liquid Staking Token vault for ETH derivatives
 - **RWAVault.sol**: Real-World Asset vault for tokenized assets
 
-### Protocol Adapters
+### DeFi Adapters
 
-- **Aave Adapter**: Lending protocol integration
+- **Aave Adapter**: Lending platform integration
 - **Curve Adapter**: Stablecoin liquidity provision
 - **Lido Adapter**: ETH staking rewards
 - **Uniswap Adapter**: DEX liquidity and trading
@@ -41,8 +41,8 @@ KUSD is a decentralized stablecoin protocol that enables users to mint stable to
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/kusd-defi-protocol.git
-cd kusd-defi-protocol
+git clone https://github.com/your-org/kusd-defi.git
+cd kusd-defi
 
 # Install dependencies
 npm install
@@ -130,7 +130,7 @@ npm run verify -- --network sepolia <contract_address> <constructor_args>
 
 ## Network Configuration
 
-The protocol supports deployment on multiple networks:
+KUSD supports deployment on multiple networks:
 
 - **Hardhat**: Local development with mainnet fork at block 20,100,000
 - **Sepolia**: Ethereum testnet
@@ -147,7 +147,7 @@ The protocol supports deployment on multiple networks:
 
 ## Testing
 
-The protocol includes comprehensive test suites:
+The system includes comprehensive test suites:
 
 - **Unit Tests**: Individual contract functionality
 - **Integration Tests**: Multi-contract interactions
@@ -176,4 +176,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Disclaimer
 
-This is experimental software. Use at your own risk. The protocol has not been audited and should not be used in production with real funds.
+This is experimental software. Use at your own risk. The system has not been audited and should not be used in production with real funds.

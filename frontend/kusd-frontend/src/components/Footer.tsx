@@ -41,10 +41,9 @@ const Footer: React.FC = () => {
             >
               <div className="footer-logo">
                 <span className="logo-text text-gradient">KUSD</span>
-                <span className="logo-subtitle">Protocol</span>
               </div>
               <p className="footer-description">
-                Next-generation multi-asset stablecoin protocol with AI-powered yield optimization. 
+                Next-generation multi-asset stablecoin with AI-powered yield optimization. 
                 Building the future of decentralized finance.
               </p>
               <div className="social-links">
@@ -83,7 +82,7 @@ const Footer: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Protocol Links */}
+            {/* KUSD Links */}
             <motion.div
               className="footer-section"
               initial={{ opacity: 0, y: 30 }}
@@ -91,7 +90,7 @@ const Footer: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.1 }}
               viewport={{ once: true }}
             >
-              <h4 className="footer-heading">Protocol</h4>
+              <h4 className="footer-heading">KUSD</h4>
               <ul className="footer-links">
                 <li>
                   <button onClick={() => scrollToSection('dashboard')} className="footer-link">
@@ -207,7 +206,7 @@ const Footer: React.FC = () => {
             <div className="newsletter-card glow">
               <div className="newsletter-content">
                 <h3>Stay Updated</h3>
-                <p>Get the latest updates on KUSD Protocol developments and DeFi insights.</p>
+                <p>Get the latest updates on KUSD developments and DeFi insights.</p>
                 <div className="newsletter-form">
                   <input
                     type="email"
@@ -231,7 +230,7 @@ const Footer: React.FC = () => {
         <div className="footer-bottom">
           <div className="footer-bottom-content">
             <div className="footer-bottom-left">
-              <p>&copy; 2024 KUSD Protocol. All rights reserved.</p>
+              <p>&copy; 2024 KUSD. All rights reserved.</p>
               <div className="footer-legal">
                 <a href="#" className="legal-link">Privacy Policy</a>
                 <a href="#" className="legal-link">Terms of Service</a>
