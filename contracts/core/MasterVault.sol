@@ -265,7 +265,7 @@ contract MasterVault is AccessControl, ReentrancyGuard, Pausable {
         emit Rebalanced(params.rwaWeight, params.lstWeight, params.defiWeight, params.optionsWeight);
     }
 
-    function _executeRebalance(RebalanceParams calldata params) private {
+    function _executeRebalance(RebalanceParams memory params) private {
         // This would implement the complex rebalancing logic
         // Including withdrawing from over-allocated vaults and depositing to under-allocated ones
         // For now, just emit the event - full implementation would be quite complex

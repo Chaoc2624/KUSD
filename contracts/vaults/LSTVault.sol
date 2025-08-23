@@ -42,7 +42,7 @@ contract LSTVault is IVault, AccessControl, Pausable, ReentrancyGuard {
 
     constructor(
         address _asset,
-        address _lidoAdapter,
+        address payable _lidoAdapter,
         address admin
     ) {
         asset = IERC20(_asset);
@@ -142,14 +142,14 @@ contract LSTVault is IVault, AccessControl, Pausable, ReentrancyGuard {
         uint256 totalAssetsValue,
         uint256 apy
     ) {
-        uint256 apy = _calculateAPY();
+        uint256 currentAPY = _calculateAPY();
         return (
             "LST Vault",
             "Liquid Staking Token vault providing ETH staking yields",
             address(asset),
             totalShares,
             totalAssets(),
-            apy
+            currentAPY
         );
     }
 

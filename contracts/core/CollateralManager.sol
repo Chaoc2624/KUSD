@@ -250,7 +250,7 @@ contract CollateralManager is ReentrancyGuard, AccessControl, Pausable {
         position.tokenBalances[token] -= collateralToSeize;
         collateralTokens[token].totalDeposited -= collateralToSeize;
         
-        emit Liquidation(user, msg.sender, token, repayAmount, collateralToSeized);
+        emit Liquidation(user, msg.sender, token, repayAmount, collateralToSeize);
     }
 
     function _accrueInterest(address user) private {

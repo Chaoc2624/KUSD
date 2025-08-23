@@ -38,7 +38,7 @@ contract OracleAdapter is AccessControl, Pausable {
         uint256 maxStaleness
     );
     event PriceFeedRemoved(address indexed token);
-    event StalePrice(address indexed token, uint256 lastUpdate);
+    event StalePriceEvent(address indexed token, uint256 lastUpdate);
 
     error TokenNotSupported(address token);
     error InvalidPrice(address token, int256 price);

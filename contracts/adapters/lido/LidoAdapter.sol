@@ -59,7 +59,7 @@ contract LidoAdapter is AccessControl, ReentrancyGuard {
     IWETH public immutable weth;
     IUniswapV3Router public immutable uniswapRouter;
     
-    address public constant USDC = 0xA0b86991c431C90744B78b1ea8DbfEF6FBD5B25A; // USDC mainnet
+    address public constant USDC = 0xa0B86991c431C90744B78B1eA8dBfeF6FBd5B25a; // USDC mainnet
     
     uint256 public totalStaked;
     uint256 public totalRewards;
@@ -253,7 +253,13 @@ contract LidoAdapter is AccessControl, ReentrancyGuard {
      * @dev Get total value locked in USD terms
      */
     function getTVL() external view returns (uint256) {
-        return getBalance();
+        uint256 wstETHBalance = wstETH.balanceOf(address(this));
+        if (wstETHBalance == 0) return 0;
+        
+        uint256 stETHValue = wstETH.getStETHByWstETH(wstETHBalance);
+        uint256 ethValue = _getETHValue(stETHValue);
+        
+        return _estimateKUSDValue(ethValue);
     }
 
     receive() external payable {}
