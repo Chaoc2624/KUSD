@@ -1,161 +1,77 @@
-# KUSD Frontend
+# KUSD Frontend - Current Status
 
-A modern, dark-themed frontend interface for KUSD DeFi featuring:
+## Overview
+This is the frontend application for the KUSD DeFi protocol. Currently, the frontend is configured but the smart contracts are not deployed, which is why you're seeing the "missing revert data" error.
 
-- **Dark Gradient Theme**: Beautiful dark color scheme with blue accents
-- **Single-Page Scrolling**: Smooth navigation between sections
-- **Dashboard Cards**: Interactive card-style components with hover effects
-- **Glow Effects**: Hover animations with neon glow effects
-- **Parallax Background**: Animated background with floating elements
-- **Web3 Integration**: Wallet connection and blockchain interaction
-- **Responsive Design**: Mobile-first responsive layout
+## Current Issue
+The frontend is trying to interact with smart contracts that haven't been deployed yet. The error occurs because:
 
-## Features
+1. **Contract addresses are hardcoded** in `src/consts/ContractAddress.tsx`
+2. **Contracts don't exist** on the network yet
+3. **Frontend expects deployed contracts** to handle deposits
 
-### 🎨 UI/UX Features
-- Modern dark gradient background with animated orbs
-- Card-based dashboard with smooth hover animations
-- Glowing buttons and interactive elements
-- Parallax scrolling effects
-- Smooth animations with Framer Motion
-- Mobile-responsive design
+## What You Need to Do
 
-### 🔗 Web3 Features
-- MetaMask wallet connection
-- Multi-chain support (Ethereum, Arbitrum, Optimism, Sepolia)
-- Real-time balance display
-- Network switching
-- Account management
+### Option 1: Deploy the Smart Contracts (Recommended)
+1. **Deploy contracts to Sepolia testnet:**
+   ```bash
+   cd /path/to/KUSD
+   npm run deploy:sepolia
+   ```
 
-### 📱 Components
-- **Header**: Navigation with wallet connection
-- **Hero**: Landing section with animated features
-- **Dashboard**: Interactive KUSD dashboard
-- **Features**: Animated feature showcase
-- **Footer**: Links and newsletter signup
-- **ParallaxBackground**: Animated background effects
+2. **Update contract addresses:**
+   - Copy the deployed addresses from the deployment output
+   - Update `src/consts/ContractAddress.tsx` with the real addresses
+   - Replace the placeholder addresses with actual deployed contract addresses
 
-## Getting Started
+3. **Restart the frontend:**
+   ```bash
+   cd frontend/kusd-frontend
+   npm run dev
+   ```
 
-### Prerequisites
-- Node.js (v16 or higher)
-- MetaMask or another Web3 wallet
+### Option 2: Use a Different Network
+If you want to test on a different network:
+1. Update the hardcoded addresses in `ContractAddress.tsx`
+2. Make sure the contracts are deployed on that network
+3. Update the network configuration
 
-### Installation
+## Current Frontend Features
+- ✅ Wallet connection (MetaMask, WalletConnect)
+- ✅ Network detection and switching
+- ✅ Token selection interface
+- ✅ Amount input and validation
+- ✅ Contract status checking
+- ❌ Actual deposits (requires deployed contracts)
 
-1. Navigate to the frontend directory:
-```bash
-cd frontend/kusd-frontend
-```
+## Architecture Notes
+The frontend is designed to work with:
+- **MasterVault**: Main contract for user deposits
+- **CollateralManager**: Manages collateral and lending
+- **RiskManager**: Handles risk parameters
+- **Various Vaults**: RWA, LST, DeFi, Options vaults
 
-2. Install dependencies:
-```bash
-npm install
-```
+## Development Status
+- **Frontend**: ✅ Complete and functional
+- **Smart Contracts**: ✅ Written and tested
+- **Deployment**: ❌ Not deployed yet
+- **Integration**: ❌ Frontend-backend not connected
 
-3. Start the development server:
-```bash
-npm run dev
-```
+## Next Steps
+1. Deploy the smart contracts
+2. Update the frontend configuration
+3. Test the complete deposit flow
+4. Implement additional features (withdrawals, portfolio view, etc.)
 
-4. Open your browser and visit `http://localhost:5173`
+## Troubleshooting
+If you continue to see errors:
+1. Check that contracts are deployed on the correct network
+2. Verify contract addresses are correct
+3. Ensure the network matches between frontend and contracts
+4. Check browser console for detailed error messages
 
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-
-## Usage
-
-### Wallet Connection
-1. Click the "Connect Wallet" button in the header
-2. Select MetaMask (or your preferred wallet)
-3. Approve the connection request
-4. Your balance and address will be displayed
-
-### Navigation
-- Use the header navigation to scroll to different sections
-- All navigation is smooth scrolling within the single page
-- Mobile users get a hamburger menu
-
-### Dashboard
-- View your portfolio overview
-- Check current statistics
-- Use the mint/redeem interface
-- View recent transactions
-
-## Technology Stack
-
-- **React 18** - UI framework
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **Framer Motion** - Animations and transitions
-- **Ethers.js** - Ethereum blockchain interaction
-- **Lucide React** - Icon library
-- **CSS Variables** - Theming system
-
-## Color Scheme
-
-The frontend uses a carefully crafted dark theme:
-
-- Primary Background: Dark gradient from black to blue
-- Card Background: Translucent dark blue
-- Accent Colors: Cyan to blue gradient
-- Text: White with blue accents
-- Hover Effects: Glowing cyan borders
-
-## Browser Support
-
-- Chrome (recommended)
-- Firefox
-- Safari
-- Edge
-
-*Note: Web3 features require a browser with MetaMask extension or built-in Web3 support.*
-
-## Development
-
-### Project Structure
-```
-src/
-├── components/          # React components
-│   ├── Header.tsx      # Navigation header
-│   ├── Hero.tsx        # Landing section
-│   ├── Dashboard.tsx   # Main dashboard
-│   ├── Features.tsx    # Feature showcase
-│   ├── Footer.tsx      # Footer section
-│   └── ParallaxBackground.tsx
-├── context/            # React contexts
-│   └── Web3Context.tsx # Web3 state management
-├── App.tsx            # Main app component
-├── main.tsx           # Entry point
-└── index.css          # Global styles
-```
-
-### Styling Approach
-- CSS-in-JS with styled-jsx
-- CSS variables for consistent theming
-- Mobile-first responsive design
-- Smooth transitions and hover effects
-
-### Web3 Integration
-The app uses a custom Web3 context that provides:
-- Wallet connection state
-- Account information
-- Balance tracking
-- Network detection
-- Transaction capabilities
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-MIT License - see the main project LICENSE file for details.
+## Support
+For issues related to:
+- **Frontend**: Check this README and the component files
+- **Smart Contracts**: Check the main project README and deployment scripts
+- **Deployment**: Check `DEPLOYMENT.md` in the root directory

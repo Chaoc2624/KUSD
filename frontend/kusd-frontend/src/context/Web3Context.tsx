@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import type { ReactNode } from 'react'
 import { ethers } from 'ethers'
 
 interface Web3ContextType {
@@ -10,7 +11,7 @@ interface Web3ContextType {
   isConnecting: boolean
   balance: string
   connectWallet: () => Promise<void>
-  disconnectWallet: () => void
+  disconnectWallet: () => Promise<void>
   switchNetwork: (chainId: number) => Promise<void>
   clearPendingRequests: () => Promise<void>
 }
@@ -37,6 +38,8 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
   const [balance, setBalance] = useState('0.0')
+  
+
 
   // Debug logs for state changes
   useEffect(() => {
@@ -54,12 +57,28 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     checkConnection()
   }, [])
 
+  // Additional check to ensure signer is properly set
+  useEffect(() => {
+    if (isConnected && provider && !signer) {
+      console.log('Provider connected but signer missing, attempting to get signer...')
+      const getSigner = async () => {
+        try {
+          const newSigner = await provider.getSigner()
+          setSigner(newSigner)
+          console.log('Signer recovered:', !!newSigner)
+        } catch (error) {
+          console.error('Failed to recover signer:', error)
+        }
+      }
+      getSigner()
+    }
+  }, [isConnected, provider, signer])
+
   // Listen for account changes
   useEffect(() => {
     if (window.ethereum) {
       window.ethereum.on('accountsChanged', handleAccountsChanged)
       window.ethereum.on('chainChanged', handleChainChanged)
-      
       return () => {
         window.ethereum.removeListener('accountsChanged', handleAccountsChanged)
         window.ethereum.removeListener('chainChanged', handleChainChanged)
@@ -108,7 +127,8 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
 
         console.log('Provider initialized:', {
           address,
-          chainId: Number(network.chainId)
+          chainId: Number(network.chainId),
+          signerAvailable: !!signerInstance
         })
 
         setProvider(browserProvider)
@@ -117,6 +137,15 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
         setChainId(Number(network.chainId))
         setIsConnected(true)
         setIsConnecting(false) // Ensure connecting state is reset on success
+        
+        // Verify signer is working
+        try {
+          const testMessage = "Test message for signer verification"
+          await signerInstance.signMessage(testMessage)
+          console.log('Signer verification successful')
+        } catch (signError) {
+          console.warn('Signer verification failed:', signError)
+        }
         
       } catch (error) {
         console.error('Error initializing provider:', error)
@@ -217,7 +246,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     }
   }
 
-  const disconnectWallet = () => {
+  const disconnectWallet = async (): Promise<void> => {
     setProvider(null)
     setSigner(null)
     setAccount(null)
@@ -227,31 +256,48 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
   }
 
   const switchNetwork = async (targetChainId: number) => {
-    if (!window.ethereum) return
+    if (!window.ethereum) {
+      alert('Please install MetaMask or another Web3 wallet to switch networks');
+      return;
+    }
 
     const chainIdHex = `0x${targetChainId.toString(16)}`
+    const networkName = getNetworkConfig(targetChainId)?.chainName || 'Unknown Network';
     
     try {
+      console.log(`Switching to network: ${networkName} (${chainIdHex})`);
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: chainIdHex }],
-      })
+      });
+      console.log(`Successfully switched to ${networkName}`);
     } catch (error: any) {
+      console.error('Network switch error:', error);
+
       if (error.code === 4902) {
         // Network not added to wallet
         try {
-          const networkConfig = getNetworkConfig(targetChainId)
+          console.log(`Adding network ${networkName} to wallet...`);
+          const networkConfig = getNetworkConfig(targetChainId);
           if (networkConfig) {
             await window.ethereum.request({
               method: 'wallet_addEthereumChain',
               params: [networkConfig],
-            })
+            });
+            console.log(`Successfully added ${networkName} to wallet`);
+          } else {
+            throw new Error(`Network configuration not found for chain ID ${targetChainId}`);
           }
-        } catch (addError) {
-          console.error('Error adding network:', addError)
+        } catch (addError: any) {
+          console.error('Error adding network:', addError);
+          alert(`Failed to add ${networkName} to your wallet. Please add it manually in MetaMask.`);
         }
+      } else if (error.code === 4001) {
+        // User rejected the request
+        alert(`You rejected the request to switch to ${networkName}. Please try again.`);
       } else {
-        console.error('Error switching network:', error)
+        console.error('Error switching network:', error);
+        alert(`Failed to switch to ${networkName}. Please try again or add the network manually in MetaMask.`);
       }
     }
   }
@@ -286,6 +332,13 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
         rpcUrls: ['https://mainnet.optimism.io'],
         blockExplorerUrls: ['https://optimistic.etherscan.io/'],
       },
+      137: {
+        chainId: '0x89',
+        chainName: 'Polygon Mainnet',
+        nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
+        rpcUrls: ['https://polygon-rpc.com/'],
+        blockExplorerUrls: ['https://polygonscan.com/'],
+      },
     }
     return configs[chainId]
   }
@@ -301,6 +354,8 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
   const handleChainChanged = () => {
     window.location.reload()
   }
+
+
 
   const value: Web3ContextType = {
     provider,
