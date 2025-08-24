@@ -119,7 +119,7 @@ const Dashboard: React.FC = () => {
                 <TrendingUp size={24} />
               </div>
               <div className="stat-content">
-                <div className="stat-value">15.8%</div>
+                <div className="stat-value">20%</div>
                 <div className="stat-label">Current APY</div>
               </div>
             </div>
