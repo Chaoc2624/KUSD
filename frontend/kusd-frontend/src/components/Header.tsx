@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Menu, X, Wallet, ChevronDown } from 'lucide-react'
 import { useWeb3 } from '../context/Web3Context'
+import { Link } from 'react-router-dom'
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -57,10 +58,12 @@ const Header: React.FC = () => {
           {/* Desktop Navigation */}
           <nav className="nav-desktop">
             <ul className="nav-list">
-              <li><button onClick={() => scrollToSection('hero')} className="nav-link">Home</button></li>
-              <li><button onClick={() => scrollToSection('dashboard')} className="nav-link">Dashboard</button></li>
-              <li><button onClick={() => scrollToSection('features')} className="nav-link">Features</button></li>
-              <li><button onClick={() => scrollToSection('contact')} className="nav-link">Contact</button></li>
+              <li><Link to="/" onClick={() => scrollToSection('hero')} className="nav-link">Home</Link></li>
+              <li><Link to="/" onClick={() => scrollToSection('dashboard')} className="nav-link">Dashboard</Link></li>
+              <li><Link to="/deposit" className="nav-link">Deposit</Link></li>
+              <li><Link to="/wallet" className="nav-link">Wallet</Link></li>
+              <li><Link to="/supported-chains" className="nav-link">Supported Chains</Link></li>
+              <li><Link to="/contact" className="nav-link">Contact</Link></li>
             </ul>
           </nav>
 
