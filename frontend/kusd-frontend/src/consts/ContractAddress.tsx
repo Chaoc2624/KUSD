@@ -8,7 +8,7 @@ const contractAddress: { [chainId: number]: any } = {
           wbtc: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", // Sepolia WBTC
           aave: "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9", // Sepolia AAVE
           // KUSD deposit contract
-          depositContract: "0xAeE3625b0E6a4FfAc196d4DCB51dCe7568dD6353"
+          depositContract: "0x0a9fE16681b05B07FF17488B220e26fbF213DF36"
       },
           1: { // Ethereum Mainnet
           kusd: "0x0000000000000000000000000000000000000000",
@@ -21,7 +21,7 @@ const contractAddress: { [chainId: number]: any } = {
           wbtc: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
           aave: "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
           // KUSD deposit contract
-          depositContract: "0x1234567890123456789012345678901234567890"
+          depositContract: "0x0a9fE16681b05B07FF17488B220e26fbF213DF36"
       },
       42161: { // Arbitrum One
           kusd: "0x0000000000000000000000000000000000000000",
@@ -31,7 +31,7 @@ const contractAddress: { [chainId: number]: any } = {
           wbtc: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
           aave: "0x0000000000000000000000000000000000000000",
           // KUSD deposit contract
-          depositContract: "0x1234567890123456789012345678901234567890"
+          depositContract: "0x0a9fE16681b05B07FF17488B220e26fbF213DF36"
       },
       10: { // Optimism
           kusd: "0x0000000000000000000000000000000000000000",
@@ -41,7 +41,7 @@ const contractAddress: { [chainId: number]: any } = {
           wbtc: "0x68f180fcCe6836688e9084f035309E29Bf0A2095",
           aave: "0x0000000000000000000000000000000000000000",
           // KUSD deposit contract
-          depositContract: "0x1234567890123456789012345678901234567890"
+          depositContract: "0x0a9fE16681b05B07FF17488B220e26fbF213DF36"
       }
 }
 
