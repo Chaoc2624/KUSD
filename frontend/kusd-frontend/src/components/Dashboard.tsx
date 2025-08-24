@@ -1,29 +1,71 @@
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
-import { useInView } from 'react-intersection-observer'
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { useNavigate } from "react-router-dom";
 import {
-  Wallet,
   TrendingUp,
-  PieChart,
-  Zap,
+  Activity,
   DollarSign,
   BarChart3,
-  Activity,
-  CreditCard,
-  RefreshCw,
+  Plus,
   ArrowUpRight,
-  ArrowDownRight
-} from 'lucide-react'
+  RefreshCw,
+  PieChart,
+  ArrowRight,
+  ExternalLink,
+  Zap,
+  ArrowDownRight,
+  CreditCard,
+} from "lucide-react";
+import { useWeb3 } from "../context/Web3Context";
+import { api } from "../consts/Apis";
+import type { PortfolioOverviewResponse } from "../consts/Apis";
 
 const Dashboard: React.FC = () => {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1
-  })
+  });
+  const navigate = useNavigate();
+  const web3Context = useWeb3();
+  
+  // Portfolio state
+  const [portfolioData, setPortfolioData] = useState<PortfolioOverviewResponse | null>(null);
+  const [isLoadingPortfolio, setIsLoadingPortfolio] = useState(false);
+  const [portfolioError, setPortfolioError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'mint' | 'redeem'>('mint')
-  const [mintAmount, setMintAmount] = useState('')
-  const [collateralAmount, setCollateralAmount] = useState('')
+  // Fetch portfolio data
+  const fetchPortfolioData = async () => {
+    try {
+      setIsLoadingPortfolio(true);
+      setPortfolioError(null);
+      
+      const response = await api.getPortfolioOverviewPublic();
+      
+      if (response.success && response.data) {
+        setPortfolioData(response.data);
+        console.log('Portfolio data loaded:', response.data);
+      } else {
+        setPortfolioError(response.error || 'Failed to load portfolio data');
+        console.warn('Portfolio API error:', response.error);
+      }
+    } catch (error: any) {
+      setPortfolioError(error.message || 'Failed to fetch portfolio data');
+      console.error('Portfolio fetch error:', error);
+    } finally {
+      setIsLoadingPortfolio(false);
+    }
+  };
+
+  // Load portfolio data on mount
+  useEffect(() => {
+    fetchPortfolioData();
+  }, []);
+
+  // Refresh portfolio data
+  const handleRefreshPortfolio = () => {
+    fetchPortfolioData();
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -42,7 +84,7 @@ const Dashboard: React.FC = () => {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut"
+        ease: "easeOut" as const
       }
     }
   }
@@ -82,34 +124,77 @@ const Dashboard: React.FC = () => {
                 className="refresh-btn"
                 whileHover={{ rotate: 180 }}
                 transition={{ duration: 0.5 }}
+                onClick={handleRefreshPortfolio}
+                disabled={isLoadingPortfolio}
               >
-                <RefreshCw size={16} />
+                <RefreshCw size={16} className={isLoadingPortfolio ? 'animate-spin' : ''} />
               </motion.button>
             </div>
 
-            <div className="portfolio-stats">
-              <div className="stat-large">
-                <div className="stat-value">$12,847.32</div>
-                <div className="stat-label">Total Portfolio Value</div>
-                <div className="stat-change positive">
-                  <ArrowUpRight size={16} />
-                  +5.24%
-                </div>
+            {isLoadingPortfolio ? (
+              <div className="loading-state">
+                <div className="spinner"></div>
+                <p>Loading portfolio data...</p>
               </div>
+            ) : portfolioError ? (
+              <div className="error-state">
+                <p>Error: {portfolioError}</p>
+                <button onClick={handleRefreshPortfolio} className="retry-btn">
+                  Retry
+                </button>
+              </div>
+            ) : portfolioData ? (
+              <div className="portfolio-stats">
+                <div className="stat-large">
+                  <div className="stat-value">${portfolioData.totalKusd}</div>
+                  <div className="stat-label">Total KUSD Balance</div>
+                  <div className="stat-change positive">
+                    <ArrowUpRight size={16} />
+                    {(portfolioData.apy * 100).toFixed(2)}% APY
+                  </div>
+                </div>
 
-              <div className="portfolio-breakdown">
-                <div className="breakdown-item">
-                  <div className="breakdown-color bg-gradient-1"></div>
-                  <span>KUSD Balance</span>
-                  <span className="breakdown-value">$8,420.50</span>
+                <div className="portfolio-breakdown">
+                  <div className="breakdown-item">
+                    <div className="breakdown-color bg-gradient-1"></div>
+                    <span>Total Value Locked</span>
+                    <span className="breakdown-value">${portfolioData.tvlKusd}</span>
+                  </div>
+                  <div className="breakdown-item">
+                    <div className="breakdown-color bg-gradient-2"></div>
+                    <span>Assets</span>
+                    <span className="breakdown-value">{portfolioData.byAsset.length}</span>
+                  </div>
                 </div>
-                <div className="breakdown-item">
-                  <div className="breakdown-color bg-gradient-2"></div>
-                  <span>Collateral</span>
-                  <span className="breakdown-value">$4,426.82</span>
-                </div>
+
+                {/* Asset Breakdown */}
+                {portfolioData.byAsset.length > 0 && (
+                  <div className="assets-breakdown">
+                    <h4>Asset Breakdown</h4>
+                    <div className="assets-list">
+                      {portfolioData.byAsset.map((asset, index) => (
+                        <div key={index} className="asset-item">
+                          <div className="asset-info">
+                            <span className="asset-symbol">{asset.asset}</span>
+                            <span className="asset-chain">{asset.chain}</span>
+                          </div>
+                          <div className="asset-amounts">
+                            <span className="asset-amount">{asset.amount} {asset.asset}</span>
+                            <span className={`asset-kusd ${parseFloat(asset.kusd) >= 0 ? 'positive' : 'negative'}`}>
+                              {parseFloat(asset.kusd) >= 0 ? '+' : ''}{asset.kusd} KUSD
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            ) : (
+              <div className="no-data-state">
+                <p>No portfolio data available</p>
+              </div>
+            )}
           </motion.div>
 
           {/* Quick Stats */}
@@ -119,7 +204,7 @@ const Dashboard: React.FC = () => {
                 <TrendingUp size={24} />
               </div>
               <div className="stat-content">
-                <div className="stat-value">15.8%</div>
+                <div className="stat-value">{portfolioData?.apy || '--'}</div>
                 <div className="stat-label">Current APY</div>
               </div>
             </div>
@@ -129,7 +214,7 @@ const Dashboard: React.FC = () => {
                 <Activity size={24} />
               </div>
               <div className="stat-content">
-                <div className="stat-value">142%</div>
+                <div className="stat-value">{portfolioData?.collateralRatio || '--'}</div>
                 <div className="stat-label">Collateral Ratio</div>
               </div>
             </div>
@@ -139,7 +224,7 @@ const Dashboard: React.FC = () => {
                 <DollarSign size={24} />
               </div>
               <div className="stat-content">
-                <div className="stat-value">$2.5M</div>
+                <div className="stat-value">{portfolioData?.tvl || '--'}</div>
                 <div className="stat-label">TVL</div>
               </div>
             </div>
@@ -149,144 +234,44 @@ const Dashboard: React.FC = () => {
                 <BarChart3 size={24} />
               </div>
               <div className="stat-content">
-                <div className="stat-value">$184.2K</div>
+                <div className="stat-value">{portfolioData?.dailyVolume || '--'}</div>
                 <div className="stat-label">Daily Volume</div>
               </div>
             </div>
           </motion.div>
 
-          {/* Mint/Redeem Interface */}
-          <motion.div variants={cardVariants} className="dashboard-card mint-redeem-card glow">
+          {/* Deposit Interface */}
+          <motion.div variants={cardVariants} className="dashboard-card deposit-card glow">
             <div className="card-header">
-              <div className="tab-selector">
-                <button
-                  className={`tab-btn ${activeTab === 'mint' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('mint')}
-                >
-                  <Zap size={16} />
-                  Mint KUSD
-                </button>
-                <button
-                  className={`tab-btn ${activeTab === 'redeem' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('redeem')}
-                >
-                  <CreditCard size={16} />
-                  Redeem
-                </button>
+              <div className="card-title">
+                <Plus size={24} />
+                <h3>Deposit Assets</h3>
               </div>
             </div>
 
-            <div className="mint-redeem-content">
-              {activeTab === 'mint' ? (
-                <div className="mint-form">
-                  <div className="input-group">
-                    <label>Collateral Amount</label>
-                    <div className="input-wrapper">
-                      <input
-                        type="number"
-                        placeholder="0.0"
-                        value={collateralAmount}
-                        onChange={(e) => setCollateralAmount(e.target.value)}
-                        className="amount-input"
-                      />
-                      <select className="token-select">
-                        <option>ETH</option>
-                        <option>stETH</option>
-                        <option>wstETH</option>
-                        <option>rETH</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="conversion-arrow">
-                    <ArrowDownRight size={20} />
-                  </div>
-
-                  <div className="input-group">
-                    <label>KUSD to Mint</label>
-                    <div className="input-wrapper">
-                      <input
-                        type="number"
-                        placeholder="0.0"
-                        value={mintAmount}
-                        onChange={(e) => setMintAmount(e.target.value)}
-                        className="amount-input"
-                      />
-                      <span className="token-label">KUSD</span>
-                    </div>
-                  </div>
-
-                  <div className="transaction-info">
-                    <div className="info-row">
-                      <span>Collateral Ratio</span>
-                      <span className="text-accent">150%</span>
-                    </div>
-                    <div className="info-row">
-                      <span>Liquidation Price</span>
-                      <span>$1,834.22</span>
-                    </div>
-                    <div className="info-row">
-                      <span>Est. Gas Fee</span>
-                      <span>~$8.45</span>
-                    </div>
-                  </div>
-
-                  <motion.button
-                    className="action-btn primary glow-intense"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Mint KUSD
-                  </motion.button>
+            <div className="deposit-content">
+              <div className="deposit-info">
+                <h4>Start earning with KUSD</h4>
+                <p>Deposit supported assets to begin your DeFi journey</p>
+                
+                <div className="supported-tokens">
+                  <span className="token-badge">USDT</span>
+                  <span className="token-badge">USDC</span>
+                  <span className="token-badge">ETH</span>
+                  <span className="token-badge">BTC</span>
+                  <span className="token-badge">AAVE</span>
                 </div>
-              ) : (
-                <div className="redeem-form">
-                  <div className="input-group">
-                    <label>KUSD Amount</label>
-                    <div className="input-wrapper">
-                      <input
-                        type="number"
-                        placeholder="0.0"
-                        value={mintAmount}
-                        onChange={(e) => setMintAmount(e.target.value)}
-                        className="amount-input"
-                      />
-                      <span className="token-label">KUSD</span>
-                    </div>
-                  </div>
+              </div>
 
-                  <div className="conversion-arrow">
-                    <ArrowDownRight size={20} />
-                  </div>
-
-                  <div className="input-group">
-                    <label>Collateral to Receive</label>
-                    <div className="input-wrapper">
-                      <input
-                        type="number"
-                        placeholder="0.0"
-                        value={collateralAmount}
-                        onChange={(e) => setCollateralAmount(e.target.value)}
-                        className="amount-input"
-                      />
-                      <select className="token-select">
-                        <option>ETH</option>
-                        <option>stETH</option>
-                        <option>wstETH</option>
-                        <option>rETH</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <motion.button
-                    className="action-btn secondary glow"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Redeem Collateral
-                  </motion.button>
-                </div>
-              )}
+              <motion.button
+                className="action-btn primary glow-intense"
+                onClick={() => navigate('/deposit')}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Plus size={20} />
+                Deposit Assets
+              </motion.button>
             </div>
           </motion.div>
 
@@ -519,6 +504,71 @@ const Dashboard: React.FC = () => {
           color: var(--text-primary);
         }
 
+        .assets-breakdown h4 {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--text-primary);
+          margin-bottom: 1rem;
+        }
+
+        .assets-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+
+        .asset-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.75rem 1rem;
+          background: rgba(79, 172, 254, 0.05);
+          border-radius: 12px;
+          border: 1px solid rgba(79, 172, 254, 0.1);
+        }
+
+        .asset-info {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+
+        .asset-symbol {
+          font-weight: 600;
+          color: var(--text-primary);
+          font-size: 1rem;
+        }
+
+        .asset-chain {
+          font-size: 0.8rem;
+          color: var(--text-muted);
+        }
+
+        .asset-amounts {
+          display: flex;
+          align-items: baseline;
+          gap: 0.5rem;
+        }
+
+        .asset-amount {
+          font-weight: 600;
+          color: var(--text-primary);
+          font-size: 1rem;
+        }
+
+        .asset-kusd {
+          font-weight: 600;
+          font-size: 1rem;
+        }
+
+        .asset-kusd.positive {
+          color: var(--success);
+        }
+
+        .asset-kusd.negative {
+          color: var(--danger);
+        }
+
         .stats-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -571,121 +621,51 @@ const Dashboard: React.FC = () => {
           font-size: 0.9rem;
         }
 
-        .mint-redeem-card {
+        .deposit-card {
           grid-column: 1 / -1;
         }
 
-        .tab-selector {
+        .deposit-content {
           display: flex;
-          background: rgba(79, 172, 254, 0.1);
-          border-radius: 12px;
-          padding: 0.25rem;
-        }
-
-        .tab-btn {
-          display: flex;
+          flex-direction: column;
           align-items: center;
-          gap: 0.5rem;
-          background: none;
-          border: none;
-          color: var(--text-secondary);
-          padding: 0.75rem 1.5rem;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: all var(--transition-fast);
-          font-weight: 600;
+          gap: 2rem;
+          padding: 2rem 0;
+          text-align: center;
         }
 
-        .tab-btn.active {
-          background: var(--accent-gradient);
-          color: white;
-        }
-
-        .mint-redeem-content {
-          padding: 1rem 0;
-        }
-
-        .input-group {
-          margin-bottom: 1.5rem;
-        }
-
-        .input-group label {
-          display: block;
-          color: var(--text-secondary);
-          margin-bottom: 0.5rem;
-          font-weight: 500;
-        }
-
-        .input-wrapper {
-          display: flex;
-          align-items: center;
-          background: rgba(79, 172, 254, 0.05);
-          border: 1px solid var(--card-border);
-          border-radius: 12px;
-          padding: 1rem;
-          transition: border-color var(--transition-fast);
-        }
-
-        .input-wrapper:focus-within {
-          border-color: var(--accent-primary);
-        }
-
-        .amount-input {
-          flex: 1;
-          background: none;
-          border: none;
-          color: var(--text-primary);
+        .deposit-info h4 {
           font-size: 1.5rem;
-          font-weight: 600;
-          outline: none;
-        }
-
-        .amount-input::placeholder {
-          color: var(--text-muted);
-        }
-
-        .token-select {
-          background: var(--accent-gradient);
-          border: none;
-          color: white;
-          padding: 0.5rem 1rem;
-          border-radius: 8px;
-          font-weight: 600;
-          cursor: pointer;
-        }
-
-        .token-label {
-          color: var(--text-accent);
-          font-weight: 600;
-          padding: 0.5rem 1rem;
-          background: rgba(79, 172, 254, 0.1);
-          border-radius: 8px;
-        }
-
-        .conversion-arrow {
-          display: flex;
-          justify-content: center;
-          margin: 1rem 0;
-          color: var(--text-accent);
-        }
-
-        .transaction-info {
-          background: rgba(79, 172, 254, 0.05);
-          border-radius: 12px;
-          padding: 1rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .info-row {
-          display: flex;
-          justify-content: space-between;
+          font-weight: 700;
+          color: var(--text-primary);
           margin-bottom: 0.5rem;
-          color: var(--text-secondary);
         }
 
-        .info-row:last-child {
-          margin-bottom: 0;
+        .deposit-info p {
+          color: var(--text-secondary);
+          margin-bottom: 1.5rem;
+          font-size: 1.1rem;
         }
+
+        .supported-tokens {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+          justify-content: center;
+          margin-bottom: 1rem;
+        }
+
+        .token-badge {
+          background: rgba(79, 172, 254, 0.1);
+          color: var(--accent-primary);
+          padding: 0.5rem 1rem;
+          border-radius: 20px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          border: 1px solid rgba(79, 172, 254, 0.2);
+        }
+
+
 
         .action-btn {
           width: 100%;
@@ -788,6 +768,45 @@ const Dashboard: React.FC = () => {
         .usd-value {
           font-size: 0.9rem;
           color: var(--text-muted);
+        }
+
+        .loading-state,
+        .error-state,
+        .no-data-state {
+          text-align: center;
+          padding: 2rem;
+          color: var(--text-secondary);
+        }
+
+        .loading-state .spinner {
+          border: 4px solid rgba(255, 255, 255, 0.3);
+          border-top: 4px solid var(--accent-primary);
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 1rem;
+        }
+
+        .retry-btn {
+          background: var(--accent-primary);
+          color: white;
+          padding: 0.75rem 1.5rem;
+          border-radius: 12px;
+          font-size: 1rem;
+          font-weight: 600;
+          border: none;
+          cursor: pointer;
+          transition: all var(--transition-smooth);
+        }
+
+        .retry-btn:hover {
+          background: var(--accent-primary-dark);
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
