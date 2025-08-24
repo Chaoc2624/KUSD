@@ -74,7 +74,8 @@ func (h *UserHandler) LoginSIWE(c *gin.Context) {
 func (h *UserHandler) GetProfile(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
-		userID = uint64(1)
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("Authentication required: user_id not found in context"))
+		return
 	}
 
 	user, err := h.userService.GetUserByID(userID.(uint64))

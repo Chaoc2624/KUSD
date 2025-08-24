@@ -35,7 +35,8 @@ func NewWalletHandler(walletService *service.WalletService) *WalletHandler {
 func (h *WalletHandler) GetDepositAddress(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
-		userID = uint64(1)
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("Authentication required: user_id not found in context"))
+		return
 	}
 
 	chainKey := c.Query("chain")
@@ -77,7 +78,8 @@ type WithdrawRequest struct {
 func (h *WalletHandler) Withdraw(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
-		userID = uint64(1)
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("Authentication required: user_id not found in context"))
+		return
 	}
 
 	var req WithdrawRequest

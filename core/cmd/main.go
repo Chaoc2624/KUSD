@@ -94,19 +94,23 @@ func main() {
 	api.POST("/user/login-siwe", userHandler.LoginSIWE)
 	api.GET("/proofs/latest", proofsHandler.GetLatestProofs)
 
-	// All routes are now public (authentication disabled)
-	// User routes
-	api.GET("/user/profile", userHandler.GetProfile)
+	// Protected routes (require authentication)
+	protected := api.Group("/")
+	protected.Use(middleware.JWTAuthMiddleware())
+	{
+		// User routes
+		protected.GET("/user/profile", userHandler.GetProfile)
 
-	// Wallet routes
-	api.GET("/wallet/deposit-address", walletHandler.GetDepositAddress)
-	api.POST("/withdraw", walletHandler.Withdraw)
+		// Wallet routes
+		protected.GET("/wallet/deposit-address", walletHandler.GetDepositAddress)
+		protected.POST("/withdraw", walletHandler.Withdraw)
 
-	// Portfolio routes
-	api.GET("/portfolio/overview", portfolioHandler.GetOverview)
+		// Portfolio routes
+		protected.GET("/portfolio/overview", portfolioHandler.GetOverview)
 
-	// Records routes
-	api.GET("/records", recordsHandler.GetRecords)
+		// Records routes
+		protected.GET("/records", recordsHandler.GetRecords)
+	}
 
 	// Blockchain routes (only if blockchain service is available)
 	if blockchainHandler != nil {

@@ -36,7 +36,8 @@ func NewRecordsHandler(recordsService *service.RecordsService) *RecordsHandler {
 func (h *RecordsHandler) GetRecords(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
-		userID = uint64(1)
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("Authentication required: user_id not found in context"))
+		return
 	}
 
 	recordType := c.Query("type")
