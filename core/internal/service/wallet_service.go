@@ -1,8 +1,6 @@
 package service
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"fmt"
 
 	"github.com/shopspring/decimal"
@@ -168,6 +166,7 @@ func (s *WalletService) SubmitWithdrawRequest(userID uint64, chainKey, assetSymb
 	}
 
 	// Create withdrawal request
+	riskScoreDecimal := decimal.NewFromFloat(riskResult.RiskScore)
 	withdrawReq := &model.WithdrawRequest{
 		UserID:    userID,
 		ChainID:   chain.ID,
@@ -175,7 +174,7 @@ func (s *WalletService) SubmitWithdrawRequest(userID uint64, chainKey, assetSymb
 		Amount:    amount,
 		ToAddress: toAddress,
 		Status:    initialStatus,
-		RiskScore: &riskResult.RiskScore,
+		RiskScore: &riskScoreDecimal,
 	}
 
 	if err := s.withdrawRequestRepo.Create(withdrawReq); err != nil {

@@ -1,9 +1,9 @@
 -- USDK Privacy Stablecoin Backend Database Schema
 -- MySQL compatible
 
--- Create database if not exists
-CREATE DATABASE IF NOT EXISTS kusd DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE kusd;
+-- Use railway database (already exists)
+-- CREATE DATABASE IF NOT EXISTS kusd DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- USE kusd;
 
 -- 用户与鉴权表
 CREATE TABLE users (

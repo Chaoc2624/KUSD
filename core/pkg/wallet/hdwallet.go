@@ -1,7 +1,6 @@
 package wallet
 
 import (
-	"crypto/rand"
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/accounts"

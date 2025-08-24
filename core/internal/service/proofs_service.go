@@ -1,8 +1,6 @@
 package service
 
 import (
-	"time"
-
 	"usdk-backend/internal/repository"
 )
 
@@ -27,14 +25,14 @@ type OnchainInfo struct {
 	Tx       string `json:"tx"`
 }
 
-type ProofBatchInfo struct {
+type ProofResponse struct {
 	Type       string       `json:"type"`
 	Period     PeriodInfo   `json:"period"`
 	MerkleRoot string       `json:"merkleRoot"`
 	Onchain    *OnchainInfo `json:"onchain"`
 }
 
-type ProofsResponse []ProofBatchInfo
+type ProofsResponse []ProofResponse
 
 func (s *ProofsService) GetLatestProofs() (ProofsResponse, error) {
 	// Get latest proof batches that have been published on-chain
@@ -45,7 +43,7 @@ func (s *ProofsService) GetLatestProofs() (ProofsResponse, error) {
 
 	var proofs ProofsResponse
 	for _, batch := range batches {
-		proof := ProofBatchInfo{
+		proof := ProofResponse{
 			Type:       batch.BatchType,
 			MerkleRoot: batch.MerkleRoot,
 			Period: PeriodInfo{

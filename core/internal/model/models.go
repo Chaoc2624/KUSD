@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/shopspring/decimal"
-	"gorm.io/gorm"
 )
 
 // User 用户表

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"usdk-backend/internal/model"
 	"usdk-backend/internal/repository"
 )
 

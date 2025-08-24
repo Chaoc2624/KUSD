@@ -50,7 +50,8 @@ type BlockchainConfig struct {
 	ArbitrumRPC string
 	OptimismRPC string
 	PolygonRPC  string
-	
+	SepoliaRPC  string
+
 	Contracts map[string]ContractAddresses
 }
 
@@ -60,12 +61,12 @@ type ContractAddresses struct {
 }
 
 type PlatformConfig struct {
-	TargetAPY              float64
-	MinDepositKUSD         float64
-	MaxDailyWithdrawal     float64
-	WithdrawalFeeRate      float64
-	ConfirmationBlocks     int
-	ProofBatchIntervalSec  int
+	TargetAPY             float64
+	MinDepositKUSD        float64
+	MaxDailyWithdrawal    float64
+	WithdrawalFeeRate     float64
+	ConfirmationBlocks    int
+	ProofBatchIntervalSec int
 }
 
 type LogConfig struct {
@@ -73,9 +74,9 @@ type LogConfig struct {
 }
 
 type WalletConfig struct {
-	HDMnemonic     string
-	WalletType     string // "hd" or "random"
-	EncryptionKey  string // for encrypting private keys
+	HDMnemonic    string
+	WalletType    string // "hd" or "random"
+	EncryptionKey string // for encrypting private keys
 }
 
 var AppConfig *Config
@@ -88,11 +89,11 @@ func LoadConfig() *Config {
 
 	config := &Config{
 		Database: DatabaseConfig{
-			Host:     getEnv("DB_HOST", "localhost"),
-			Port:     getEnv("DB_PORT", "3306"),
-			User:     getEnv("DB_USER", "root"),
-			Password: getEnv("DB_PASSWORD", "123456"),
-			DBName:   getEnv("DB_NAME", "kusd"),
+			Host:     getEnv("MYSQLHOST", "127.0.0.1"),
+			Port:     getEnv("MYSQLPORT", "3306"),
+			User:     getEnv("MYSQLUSER", "root"),
+			Password: getEnv("MYSQLPASSWORD", "123456"),
+			DBName:   getEnv("MYSQLDBNAME", "127.0.0.1"),
 		},
 		Server: ServerConfig{
 			Port:    getEnv("SERVER_PORT", "8080"),
@@ -113,6 +114,7 @@ func LoadConfig() *Config {
 			ArbitrumRPC: getEnv("ARBITRUM_RPC_URL", ""),
 			OptimismRPC: getEnv("OPTIMISM_RPC_URL", ""),
 			PolygonRPC:  getEnv("POLYGON_RPC_URL", ""),
+			SepoliaRPC:  getEnv("SEPOLIA_RPC_URL", "https://sepolia.infura.io/v3/dMKelTD27GwK0QXzeqUUCnsGm4/SgZKpRx/V8yTVNNsO7lOSZQI9Xw"),
 			Contracts: map[string]ContractAddresses{
 				"ethereum": {
 					USDK:          getEnv("USDK_CONTRACT_ETHEREUM", ""),
@@ -126,15 +128,19 @@ func LoadConfig() *Config {
 					USDK:          getEnv("USDK_CONTRACT_OPTIMISM", ""),
 					ProofRegistry: getEnv("PROOF_REGISTRY_OPTIMISM", ""),
 				},
+				"sepolia": {
+					USDK:          getEnv("USDK_CONTRACT_SEPOLIA", ""),
+					ProofRegistry: getEnv("PROOF_REGISTRY_SEPOLIA", ""),
+				},
 			},
 		},
 		Platform: PlatformConfig{
-			TargetAPY:              getEnvAsFloat("TARGET_APY", 0.20),
-			MinDepositKUSD:         getEnvAsFloat("MIN_DEPOSIT_KUSD", 10.0),
-			MaxDailyWithdrawal:     getEnvAsFloat("MAX_DAILY_WITHDRAWAL", 50000.0),
-			WithdrawalFeeRate:      getEnvAsFloat("WITHDRAWAL_FEE_RATE", 0.001),
-			ConfirmationBlocks:     getEnvAsInt("CONFIRMATION_BLOCKS", 12),
-			ProofBatchIntervalSec:  getEnvAsInt("PROOF_BATCH_INTERVAL", 86400),
+			TargetAPY:             getEnvAsFloat("TARGET_APY", 0.20),
+			MinDepositKUSD:        getEnvAsFloat("MIN_DEPOSIT_KUSD", 10.0),
+			MaxDailyWithdrawal:    getEnvAsFloat("MAX_DAILY_WITHDRAWAL", 50000.0),
+			WithdrawalFeeRate:     getEnvAsFloat("WITHDRAWAL_FEE_RATE", 0.001),
+			ConfirmationBlocks:    getEnvAsInt("CONFIRMATION_BLOCKS", 12),
+			ProofBatchIntervalSec: getEnvAsInt("PROOF_BATCH_INTERVAL", 86400),
 		},
 		Log: LogConfig{
 			Level: getEnv("LOG_LEVEL", "info"),

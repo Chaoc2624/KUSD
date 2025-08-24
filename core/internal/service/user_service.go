@@ -37,15 +37,15 @@ func (s *UserService) LoginWithSIWE(message, signature string) (string, *UserInf
 	}
 
 	// Extract wallet address from verified message
-	walletAddr := siweMessage.GetAddress()
+	walletAddrHex := siweMessage.GetAddress().Hex()
 
 	// Find or create user
-	user, err := s.userRepo.FindByWalletAddr(walletAddr)
+	user, err := s.userRepo.FindByWalletAddr(walletAddrHex)
 	if err != nil {
 		// Create new user if not exists
 		nonce := s.generateNonce()
 		user = &model.User{
-			WalletAddr: &walletAddr,
+			WalletAddr: &walletAddrHex,
 			Nonce:      &nonce,
 		}
 		

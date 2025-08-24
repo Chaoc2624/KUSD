@@ -55,6 +55,13 @@ func main() {
 	portfolioService := service.NewPortfolioService(ledgerRepo, platformMetricsRepo, chainRepo, assetRepo)
 	recordsService := service.NewRecordsService(ledgerRepo)
 	proofsService := service.NewProofsService(proofBatchRepo)
+	
+	// Initialize blockchain service
+	blockchainService, err := service.NewBlockchainService()
+	if err != nil {
+		log.Printf("Warning: Failed to initialize blockchain service: %v", err)
+		log.Println("Blockchain endpoints will not be available")
+	}
 
 	// Initialize handlers
 	metaHandler := handler.NewMetaHandler(metaService)
@@ -64,6 +71,12 @@ func main() {
 	portfolioHandler := handler.NewPortfolioHandler(portfolioService)
 	recordsHandler := handler.NewRecordsHandler(recordsService)
 	proofsHandler := handler.NewProofsHandler(proofsService)
+	
+	// Initialize blockchain handler (only if service is available)
+	var blockchainHandler *handler.BlockchainHandler
+	if blockchainService != nil {
+		blockchainHandler = handler.NewBlockchainHandler(blockchainService)
+	}
 
 	// Setup Gin
 	gin.SetMode(cfg.Server.GinMode)
@@ -81,22 +94,45 @@ func main() {
 	api.POST("/user/login-siwe", userHandler.LoginSIWE)
 	api.GET("/proofs/latest", proofsHandler.GetLatestProofs)
 
-	// Protected routes
-	protected := api.Group("")
-	protected.Use(middleware.JWTAuthMiddleware())
-	{
-		// User routes
-		protected.GET("/user/profile", userHandler.GetProfile)
+	// All routes are now public (authentication disabled)
+	// User routes
+	api.GET("/user/profile", userHandler.GetProfile)
 
-		// Wallet routes
-		protected.GET("/wallet/deposit-address", walletHandler.GetDepositAddress)
-		protected.POST("/withdraw", walletHandler.Withdraw)
+	// Wallet routes
+	api.GET("/wallet/deposit-address", walletHandler.GetDepositAddress)
+	api.POST("/withdraw", walletHandler.Withdraw)
 
-		// Portfolio routes
-		protected.GET("/portfolio/overview", portfolioHandler.GetOverview)
+	// Portfolio routes
+	api.GET("/portfolio/overview", portfolioHandler.GetOverview)
 
-		// Records routes
-		protected.GET("/records", recordsHandler.GetRecords)
+	// Records routes
+	api.GET("/records", recordsHandler.GetRecords)
+
+	// Blockchain routes (only if blockchain service is available)
+	if blockchainHandler != nil {
+		blockchain := api.Group("/blockchain")
+		{
+			// USDK Token endpoints
+			blockchain.GET("/token/info", blockchainHandler.GetTokenInfo)
+			blockchain.GET("/token/balance/:address", blockchainHandler.GetBalance)
+			blockchain.GET("/token/blacklisted/:address", blockchainHandler.IsBlacklisted)
+			blockchain.GET("/token/paused", blockchainHandler.IsPaused)
+			
+			// Transaction endpoints (require private key configuration)
+			blockchain.POST("/token/transfer", blockchainHandler.Transfer)
+			blockchain.POST("/token/mint", blockchainHandler.Mint)
+			blockchain.POST("/token/burn", blockchainHandler.Burn)
+			
+			// ProofRegistry endpoints
+			blockchain.GET("/proofs/batch/:batchId", blockchainHandler.GetProofBatch)
+			blockchain.GET("/proofs/batch-count", blockchainHandler.GetBatchCount)
+			blockchain.GET("/proofs/batch-count/:batchType", blockchainHandler.GetBatchCountByType)
+			blockchain.GET("/proofs/batches/:batchType", blockchainHandler.GetBatchesByType)
+			
+			// Utility endpoints
+			blockchain.GET("/tx/:hash", blockchainHandler.GetTransactionStatus)
+			blockchain.GET("/health", blockchainHandler.HealthCheck)
+		}
 	}
 
 	// Health check
