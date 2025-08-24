@@ -79,7 +79,7 @@ const Hero: React.FC = () => {
                 <div className="stat-label">Total Value Locked</div>
               </div>
               <div className="stat-item">
-                <div className="stat-value text-gradient">15.8%</div>
+                <div className="stat-value text-gradient">20%</div>
                 <div className="stat-label">Average APY</div>
               </div>
               <div className="stat-item">
